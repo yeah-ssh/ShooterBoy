@@ -30,7 +30,6 @@ let alienWidth = tileSize * 2;
 let alienHeight = tileSize * 2;
 let alienX = tileSize;
 let alienY = tileSize;
-let alienImg;
 
 let alienRows = 2;
 let alienColumns = 3;
@@ -39,7 +38,6 @@ let alienCount = 0;
 let alienVelocityX = 1;
 
 let bossAlien;
-let bossAlienImg;
 let bossAlienWidth = tileSize * 4;
 let bossAlienHeight = tileSize * 4;
 let bossAlienHealth = 100;
@@ -49,6 +47,12 @@ let bossMoveInterval;
 
 let gameOver = false;
 let score = 0;
+let playerName = "";
+
+const alienImages = ["./ufo.png", "./ufo1.png", "./ufo2.png"]; 
+const bossImages = ["./boss1.png", "./boss2.png"]; 
+let alienImageIndex = 0;
+let bossImageIndex = 0;
 
 window.onload = function () {
     const playButton = document.getElementById("play_button");
@@ -57,7 +61,19 @@ window.onload = function () {
 
 function startGame() {
     const playButton = document.getElementById("play_button");
+    const playerNameInput = document.getElementById("player_name");
+
+    playerName = playerNameInput.value;
+    if (!playerName) {
+        alert("Please enter your name to play the game.");
+        return;
+    }
+
     playButton.style.display = "none";
+    playerNameInput.style.display = "none";
+
+    const instructions = document.querySelectorAll(".instructions");
+    instructions.forEach(inst => inst.style.display = "none");
 
     board = document.getElementById("play_area");
     board.style.display = "block";
@@ -71,16 +87,25 @@ function startGame() {
         context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
     };
 
-    alienImg = new Image();
-    alienImg.src = "./ufo.png";
-
-    bossAlienImg = new Image();
-    bossAlienImg.src = "./boss1.png"; // Replace with the path to your boss alien image
+    loadAlienImage();
+    loadBossImage();
 
     createAliens();
     requestAnimationFrame(update);
     document.addEventListener("keydown", moveShip);
     document.addEventListener("keyup", shoot);
+}
+
+function loadAlienImage() {
+    alienImg = new Image();
+    alienImg.src = alienImages[alienImageIndex];
+    alienImageIndex = (alienImageIndex + 1) % alienImages.length;
+}
+
+function loadBossImage() {
+    bossAlienImg = new Image();
+    bossAlienImg.src = bossImages[bossImageIndex];
+    bossImageIndex = (bossImageIndex + 1) % bossImages.length;
 }
 
 function update() {
@@ -108,7 +133,7 @@ function update() {
     // Display score
     context.fillStyle = "white";
     context.font = "24px Arial";
-    context.fillText("Score: " + score, 10, 30);
+    context.fillText("Score: " + score + " | Player: " + playerName, 10, 20);
 }
 
 function updateAliens() {
@@ -177,7 +202,7 @@ function updateBossAlien() {
 
 function moveBossAlienRandomly() {
     let newX = Math.random() * (boardWidth - bossAlienWidth);
-    let newY = Math.random() * (boardHeight - bossAlienHeight);
+    let newY = Math.random() * (boardHeight/2 - bossAlienHeight);
     bossAlien.x = newX;
     bossAlien.y = newY;
 }
@@ -194,7 +219,7 @@ function updateBullets() {
                 bullet.used = true;
                 alien.alive = false;
                 alienCount--;
-                score += 10; // Add score for killing an alien
+                score += 5; // Add score for killing an alien
             }
         }
     }
@@ -276,5 +301,7 @@ function resetGame() {
     bossAlienVisible = false;
     bossAlienHealth = 100;
     gameOver = false;
+    loadAlienImage();
+    loadBossImage();
     createAliens();
 }
