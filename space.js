@@ -49,10 +49,12 @@ let gameOver = false;
 let score = 0;
 let playerName = "";
 
-const alienImages = ["./ufo.png", "./ufo1.png", "./ufo2.png"]; 
-const bossImages = ["./boss1.png", "./boss2.png"]; 
+const alienImages = ["./ufo.png", "./ufo1.png", "./ufo2.png"];
+const bossImages = ["./boss1.png", "./boss2.png"];
 let alienImageIndex = 0;
 let bossImageIndex = 0;
+let alienUpdateFunctions = [updateAliensPattern1, updateAliensPattern2, updateAliensPattern3];
+let currentAlienUpdateFunctionIndex = 0;
 
 window.onload = function () {
     const playButton = document.getElementById("play_button");
@@ -123,7 +125,7 @@ function update() {
     if (bossAlienVisible) {
         updateBossAlien();
     } else {
-        updateAliens();
+        alienUpdateFunctions[currentAlienUpdateFunctionIndex]();
         checkForBossAlien();
     }
 
@@ -136,7 +138,7 @@ function update() {
     context.fillText("Score: " + score + " | Player: " + playerName, 10, 20);
 }
 
-function updateAliens() {
+function updateAliensPattern1() {
     for (let i = 0; i < alienArray.length; i++) {
         let alien = alienArray[i];
         if (alien.alive) {
@@ -149,6 +151,44 @@ function updateAliens() {
                 for (let j = 0; j < alienArray.length; j++) {
                     alienArray[j].y += alienHeight;
                 }
+            }
+
+            context.drawImage(alien.img, alien.x, alien.y, alien.width, alien.height);
+        }
+    }
+  }
+
+function updateAliensPattern2() {
+  for (let i = 0; i < alienArray.length; i++) {
+      let alien = alienArray[i];
+      if (alien.alive) {
+          // Move diagonally
+          alien.x += alienVelocityX;
+          alien.y += alienVelocityX;
+
+          // Reverse direction on hitting boundaries
+          if (alien.x + alien.width >= boardWidth || alien.x <= 0) {
+              alienVelocityX *= -1;
+          }
+          if (alien.y + alien.height >= boardHeight || alien.y <= 0) {
+              alienVelocityX *= -1;
+          }
+
+          context.drawImage(alien.img, alien.x, alien.y, alien.width, alien.height);
+      }
+  }
+}
+
+function updateAliensPattern3() {
+    for (let i = 0; i < alienArray.length; i++) {
+        let alien = alienArray[i];
+        if (alien.alive) {
+            alien.x += alienVelocityX * Math.sin(alien.y / 50);
+            alien.y += alienVelocityX;
+
+            if (alien.y + alien.height >= boardHeight || alien.y <= 0) {
+                alienVelocityX *= -1;
+                alien.y += alienVelocityX * 10;
             }
 
             context.drawImage(alien.img, alien.x, alien.y, alien.width, alien.height);
@@ -193,7 +233,7 @@ function updateBossAlien() {
             if (bossAlien.health <= 0) {
                 bossAlienVisible = false;
                 clearInterval(bossMoveInterval);
-                score += 100; // Add score for killing the boss
+                score += 100; 
                 resetGame();
             }
         }
@@ -202,7 +242,7 @@ function updateBossAlien() {
 
 function moveBossAlienRandomly() {
     let newX = Math.random() * (boardWidth - bossAlienWidth);
-    let newY = Math.random() * (boardHeight/2 - bossAlienHeight);
+    let newY = Math.random() * (boardHeight /1.25 - bossAlienHeight);
     bossAlien.x = newX;
     bossAlien.y = newY;
 }
@@ -219,7 +259,7 @@ function updateBullets() {
                 bullet.used = true;
                 alien.alive = false;
                 alienCount--;
-                score += 5; // Add score for killing an alien
+                score += 5; 
             }
         }
     }
@@ -303,5 +343,6 @@ function resetGame() {
     gameOver = false;
     loadAlienImage();
     loadBossImage();
+    currentAlienUpdateFunctionIndex = (currentAlienUpdateFunctionIndex + 1) % alienUpdateFunctions.length;
     createAliens();
 }
