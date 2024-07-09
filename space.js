@@ -229,7 +229,7 @@ function updateBossAlien() {
         let bullet = bulletArray[i];
         if (!bullet.used && detectCollision(bullet, bossAlien)) {
             bullet.used = true;
-            bossAlien.health -= 6;
+            bossAlien.health -= 10;
             if (bossAlien.health <= 0) {
                 bossAlienVisible = false;
                 clearInterval(bossMoveInterval);
@@ -244,7 +244,7 @@ function moveBossAlienRandomly() {
     let newX = Math.random() * (boardWidth - bossAlienWidth);
     let newY = Math.random() * (boardHeight - bossAlienHeight);
     let duration = 1000; // Animation duration in milliseconds
-    let framesPerSecond = 60;
+    let framesPerSecond = 50;
     let frameDuration = 1000 / framesPerSecond;
     let totalFrames = duration / frameDuration;
     let currentFrame = 0;
