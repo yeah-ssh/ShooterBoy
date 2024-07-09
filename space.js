@@ -229,6 +229,7 @@ function updateBossAlien() {
         let bullet = bulletArray[i];
         if (!bullet.used && detectCollision(bullet, bossAlien)) {
             bullet.used = true;
+            bossAlien.health -= 8;
             bossAlien.health -= 5;
             if (bossAlien.health <= 0) {
                 bossAlienVisible = false;
