@@ -50,7 +50,7 @@ let score = 0;
 let playerName = "";
 
 const alienImages = ["./ufo.png", "./ufo1.png", "./ufo2.png"];
-const bossImages = ["./boss1.png", "./boss2.png"];
+const bossImages = ["./boss1.png", "./boss2.png","./boss3.png"];
 let alienImageIndex = 0;
 let bossImageIndex = 0;
 let alienUpdateFunctions = [updateAliensPattern1, updateAliensPattern2, updateAliensPattern3];
@@ -229,7 +229,7 @@ function updateBossAlien() {
         let bullet = bulletArray[i];
         if (!bullet.used && detectCollision(bullet, bossAlien)) {
             bullet.used = true;
-            bossAlien.health -= 5;
+            bossAlien.health -= 2;
             if (bossAlien.health <= 0) {
                 bossAlienVisible = false;
                 clearInterval(bossMoveInterval);
@@ -242,9 +242,32 @@ function updateBossAlien() {
 
 function moveBossAlienRandomly() {
     let newX = Math.random() * (boardWidth - bossAlienWidth);
-    let newY = Math.random() * (boardHeight /1.25 - bossAlienHeight);
-    bossAlien.x = newX;
-    bossAlien.y = newY;
+    let newY = Math.random() * (boardHeight - bossAlienHeight);
+    let duration = 1000; // Animation duration in milliseconds
+    let framesPerSecond = 60;
+    let frameDuration = 1000 / framesPerSecond;
+    let totalFrames = duration / frameDuration;
+    let currentFrame = 0;
+
+    let start = {
+        x: bossAlien.x,
+        y: bossAlien.y
+    };
+
+    let changeInX = newX - start.x;
+    let changeInY = newY - start.y;
+
+    let animateInterval = setInterval(function() {
+        currentFrame++;
+        if (currentFrame <= totalFrames) {
+            let newXPos = start.x + (changeInX * currentFrame / totalFrames);
+            let newYPos = start.y + (changeInY * currentFrame / totalFrames);
+            bossAlien.x = newXPos;
+            bossAlien.y = newYPos;
+        } else {
+            clearInterval(animateInterval);
+        }
+    }, frameDuration);
 }
 
 function updateBullets() {
