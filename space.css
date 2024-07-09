@@ -15,6 +15,10 @@ h1 {
     margin-bottom: 20px;
 }
 
+h3{
+    color:red
+}
+
 #play_button {
     padding: 15px 30px;
     font-size: 20px;
